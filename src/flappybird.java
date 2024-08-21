@@ -61,6 +61,13 @@ public class flappybird extends JPanel implements ActionListener, KeyListener {
     Timer placePipeTimer;
     boolean gameOver = false;
     double score = 0;
+    double highScore = 0;
+
+    public void checkHighScore() {
+        if (score > highScore) {
+            highScore = score;
+        }
+    }
 
     flappybird() {
         setPreferredSize(new Dimension(boardWidth, boardHeight));
@@ -126,13 +133,21 @@ public class flappybird extends JPanel implements ActionListener, KeyListener {
         FontMetrics metrics = g.getFontMetrics(g.getFont());
 
         if (gameOver) {
-            String gameOverText = "Game Over: " + String.valueOf((int) score);
+            String gameOverText = "Game Over";
             int gameOverWidth = metrics.stringWidth(gameOverText);
-            g.drawString(gameOverText, (boardWidth - gameOverWidth) / 2, boardHeight / 2);
+            g.drawString(gameOverText, (boardWidth - gameOverWidth) / 2, boardHeight / 2 - 50);
+
+            String scoreText = "Score: " + String.valueOf((int) score);
+            int scoreWidth = metrics.stringWidth(scoreText);
+            g.drawString(scoreText, (boardWidth - scoreWidth) / 2, boardHeight / 2);
+
+            String highScoreText = "High Score: " + String.valueOf((int) highScore);
+            int highScoreWidth = metrics.stringWidth(highScoreText);
+            g.drawString(highScoreText, (boardWidth - highScoreWidth) / 2, boardHeight / 2 + 50);
 
             String continueText = "Press Space to Restart";
             int continueWidth = metrics.stringWidth(continueText);
-            g.drawString(continueText, (boardWidth - continueWidth) / 2, boardHeight / 2 + 40);
+            g.drawString(continueText, (boardWidth - continueWidth) / 2, boardHeight / 2 + 100);
         } else {
             String scoreText = String.valueOf((int) score);
             int scoreWidth = metrics.stringWidth(scoreText);
@@ -159,12 +174,14 @@ public class flappybird extends JPanel implements ActionListener, KeyListener {
             if (collision(bird, pipe)) {
                 gameOver = true;
                 sound.playSound("sfx_hit.wav");
+                checkHighScore();
             }
         }
 
         if (bird.y > boardHeight) {
             gameOver = true;
             sound.playSound("sfx_die.wav");
+            checkHighScore();
         }
     }
 
@@ -194,7 +211,7 @@ public class flappybird extends JPanel implements ActionListener, KeyListener {
                 velocityY = 0;
                 pipes.clear();
                 gameOver = false;
-                score = 0;
+                score = 0;  // Reset current score
                 gameLoop.start();
                 placePipeTimer.start();
             } else {
@@ -204,6 +221,7 @@ public class flappybird extends JPanel implements ActionListener, KeyListener {
             }
         }
     }
+
 
     @Override
     public void keyTyped(KeyEvent e) {}
